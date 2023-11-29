@@ -20,3 +20,8 @@ pip install -r requirements.txt
 
 cd .\ecommerce\
 python manage.py runserver
+
+## Tạo superuser để vào trang admin
+python manage.py superadmin
+Xong chạy: python manage.py runserver
+thêm /admin trên localhost để vào admin
