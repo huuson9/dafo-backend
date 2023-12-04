@@ -5,8 +5,7 @@
 python -m venv env
 
 ## Khởi động môi trường ảo - Virtual Environment:
-
-source env/Scripts/activate
+env/Scripts/activate
 
 ## Cài đặt các thư viện cần có
 
