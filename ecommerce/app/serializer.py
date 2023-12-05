@@ -1,10 +1,18 @@
 from rest_framework import serializers
-from .models import Order, ProductImage, Product, Category, User
+from .models import Order, ProductImage, Product, Category, User, Review, Cart
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,8 +32,15 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = "__all__"
+
+
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
 
     category = serializers.SerializerMethodField()
 
@@ -43,6 +58,5 @@ class ProductSerializer(serializers.ModelSerializer):
             "category",
             "supplier",
             "images",
+            "reviews",
         )
-
-

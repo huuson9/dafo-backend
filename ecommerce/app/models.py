@@ -81,18 +81,12 @@ class ProductImage(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="reviews"
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     rating = models.PositiveSmallIntegerField(default=0)
-    time = models.DateTimeField(auto_now_add=True)
-
-
-class Comment(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    content = models.TextField()
     time = models.DateTimeField(auto_now_add=True)
 
 

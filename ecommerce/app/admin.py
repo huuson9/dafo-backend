@@ -8,7 +8,6 @@ from .models import (
     Purchase,
     Cart,
     ProductImage,
-    Comment,
     Review,
     Voucher,
 )
@@ -23,5 +22,4 @@ admin.site.register(Purchase)
 admin.site.register(Cart)
 admin.site.register(ProductImage)
 admin.site.register(Review)
-admin.site.register(Comment)
 admin.site.register(Voucher)
