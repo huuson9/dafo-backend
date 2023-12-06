@@ -29,6 +29,8 @@ class CartAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("user", "product", "price", "time", "count", "get_product_category")
 
+    search_fields = ("user__username", "product__name", "product__category__name")
+
     def get_product_category(self, obj):
         return obj.product.category.name if obj.product.category else None
 
