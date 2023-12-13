@@ -5,6 +5,7 @@
 python -m venv env
 
 ## Khởi động môi trường ảo - Virtual Environment:
+
 env/Scripts/activate
 
 ## Cài đặt các thư viện cần có
@@ -21,6 +22,16 @@ cd .\ecommerce\
 python manage.py runserver
 
 ## Tạo superuser để vào trang admin
+
 python manage.py superadmin
 Xong chạy: python manage.py runserver
 thêm /admin trên localhost để vào admin
+
+# DOCKER
+
+Cần: Tạo thư mục `mysql_data`
+
+Build & Rebuild
+
+- Window : `bash duck.sh`
+- Unix: `sh duck.sh`

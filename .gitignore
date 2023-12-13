@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 /media/images
+
+/mysql_data/*

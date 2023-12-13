@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  dafodb:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: dafodatabase
+      MYSQL_USER: dafousername
+      MYSQL_PASSWORD: dafopassword
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    command: python ./ecommerce/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8888:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=dafodb
+      - DB_PORT=3306
+      - DB_USER=dafousername
+      - DB_PASS=dafopassword
+      - DB_NAME=dafodatabase
+    depends_on:
+      - dafodb
