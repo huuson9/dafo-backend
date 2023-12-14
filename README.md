@@ -1,26 +1,11 @@
-# dafo-backend
+# DOCKER
 
-## Set up môi trường ảo - virtual environment (Chạy 1 lần ban đầu):
 
-python -m venv env
+[@nl-qt] Có gì các canh hỏi em !
 
-## Khởi động môi trường ảo - Virtual Environment:
-env/Scripts/activate
+Cần: Tạo thư mục `mysql_data`
 
-## Cài đặt các thư viện cần có
+Build & Rebuild
 
-pip install -r requirements.txt
-
-## Tạo file .env như mẫu env.example
-
-## Tạo database ứng với .env
-
-## Chạy project
-
-cd .\ecommerce\
-python manage.py runserver
-
-## Tạo superuser để vào trang admin
-python manage.py superadmin
-Xong chạy: python manage.py runserver
-thêm /admin trên localhost để vào admin
+- Window : `bash duck.sh`
+- Unix: `sh duck.sh`

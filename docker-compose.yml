@@ -1,29 +1,29 @@
-version: "3.1"
+version: "3"
 
 services:
-  web:
-    container_name: dafo-backend-app
-    image: dafo-backend-app:latest
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    env_file:
-      - .env # Sử dụng file .env để cấu hình biến môi trường
-    depends_on:
-      - db
-
-  db:
+  dafodb:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-    ports:
-      - "3308:3306"
+      MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: dafodatabase
+      MYSQL_USER: dafousername
+      MYSQL_PASSWORD: dafopassword
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
 
-volumes:
-  mysql_data:
+  web:
+    build: .
+    command: python ./ecommerce/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8888:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=dafodb
+      - DB_PORT=3306
+      - DB_USER=dafousername
+      - DB_PASS=dafopassword
+      - DB_NAME=dafodatabase
+    depends_on:
+      - dafodb
