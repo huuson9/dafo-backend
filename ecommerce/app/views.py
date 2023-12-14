@@ -1,41 +1,56 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
+from rest_framework.views import APIView, status
 from .models import Order, Product, Category, User, Cart
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
 from .serializer import (
     OrderSerializer,
     ProductSerializer,
     CategorySerializer,
-    UserSerializer,
     CartSerializer,
+    RegisterSerializer,
+    LoginSerializer,
 )
 
 
-# Create your views here.
-class UserView(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response({"users": serializer.data})  # Trả về dữ liệu đã được serialize
+# Create your views here
 
 
-class LoginView(APIView):
-    def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        user = User.objects.filter(username=username, password=password)
-        if user:
-            serializer = UserSerializer(user, many=True)
-            return Response({"user": serializer.data})
-        else:
-            return Response({"message": "Username or password is incorrect"})
+class RegisterAPIView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        return Response(
+            {
+                "success": True,
+                "userID": user.id,
+                "msg": "The user was successfully registered",
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class LoginAPIView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class OrderView(APIView):
     def get(self, request):
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
-        return Response({"orders": serializer.data})  # Trả về dữ liệu đã được serialize
+        return Response({"orders": serializer.data})
 
     def post(self, request):
         order = request.data.get("order")
@@ -45,6 +60,14 @@ class OrderView(APIView):
         return Response(
             {"success": "Order '{}' created successfully".format(order_saved.name)}
         )
+
+
+class OrderByUserView(APIView):
+    def get(self, request, user_id):
+        # Lấy tất cả các đơn hàng của người dùng cụ thể (dựa trên user_id)
+        orders = Order.objects.filter(user=user_id)
+        serializer = OrderSerializer(orders, many=True)
+        return Response({"orders": serializer.data})
 
 
 class OrderDetailView(APIView):
@@ -69,6 +92,13 @@ class OrderDetailView(APIView):
         return Response(
             {"message": "Order with id `{}` has been deleted.".format(pk)}, status=204
         )
+
+
+class OrderByUserView(APIView):
+    def get(self, request, user_id):
+        orders = Order.objects.filter(user=user_id)
+        serializer = OrderSerializer(orders, many=True)
+        return Response({"orders": serializer.data})
 
 
 class ProductView(APIView):
@@ -150,9 +180,33 @@ class CartView(APIView):
             {"success": "Cart '{}' created successfully".format(cart_saved.name)}
         )
 
+
+class CartDetailView(APIView):
+    def get(self, request, pk):
+        cart = Cart.objects.get(pk=pk)
+        serializer = CartSerializer(cart)
+        return Response({"cart": serializer.data})
+
+    def put(self, request, pk):
+        saved_cart = Cart.objects.get(pk=pk)
+        data = request.data.get("cart")
+        serializer = CartSerializer(instance=saved_cart, data=data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            cart_saved = serializer.save()
+        return Response(
+            {"success": "Cart '{}' updated successfully".format(cart_saved.name)}
+        )
+
     def delete(self, request, pk):
         cart = Cart.objects.get(pk=pk)
         cart.delete()
         return Response(
             {"message": "Cart with id `{}` has been deleted.".format(pk)}, status=204
         )
+
+
+class CartByUserView(APIView):
+    def get(self, request, user_id):
+        carts = Cart.objects.filter(user=user_id)
+        serializer = CartSerializer(carts, many=True)
+        return Response({"carts": serializer.data})
