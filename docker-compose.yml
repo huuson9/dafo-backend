@@ -3,6 +3,7 @@ version: "3"
 services:
   dafodb:
     image: mysql:8.0
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
       MYSQL_ROOT_HOST: '%'

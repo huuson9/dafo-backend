@@ -20,14 +20,25 @@ import app.views as views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/user/", views.UserView.as_view(), name="user"),
-    path("api/login/", views.LoginView.as_view(), name="login"),
+    path("api/register/", views.RegisterAPIView.as_view(), name="register"),
+    path("api/login/", views.LoginAPIView.as_view(), name="login"),
     path("api/order/", views.OrderView.as_view(), name="order"),
     path("api/order/<int:pk>", views.OrderDetailView.as_view(), name="order-detail"),
+    path(
+        "api/order/user/<int:user_id>",
+        views.OrderByUserView.as_view(),
+        name="order-by-user",
+    ),
     path("api/product/", views.ProductView.as_view(), name="product"),
     path(
         "api/product/<int:pk>", views.ProductDetailView.as_view(), name="product-detail"
     ),
     path("api/category/", views.CategoryView.as_view(), name="category"),
     path("api/cart/", views.CartView.as_view(), name="cart"),
+    path("api/cart/<int:pk>", views.CartDetailView.as_view(), name="cart-detail"),
+    path(
+        "api/cart/user/<int:user_id>",
+        views.CartByUserView.as_view(),
+        name="cart-by-user",
+    ),
 ]
