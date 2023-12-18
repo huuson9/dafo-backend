@@ -89,9 +89,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Review
-        fields = "__all__"
+        fields = "user", "rating", "content", "time"
+
+    def get_user(self, obj):
+        return {
+            "email": obj.user.email,
+        }
 
 
 class ProductSerializer(serializers.ModelSerializer):
