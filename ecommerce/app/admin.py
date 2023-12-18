@@ -43,8 +43,21 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ["user", "product__category"]
 
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "email",
+        "username",
+        "phone",
+        "date_of_birth",
+        "is_staff",
+        "is_active",
+        "is_superuser",
+    )
+
+
 # Register your models here.
-admin.site.register(User)
+admin.site.register(User, UserAdmin)
 admin.site.register(Supplier)
 admin.site.register(Category)
 admin.site.register(Product, ProductAdmin)

@@ -11,10 +11,31 @@ from .serializer import (
     CartSerializer,
     RegisterSerializer,
     LoginSerializer,
+    UserUpdateSerializer,
 )
 
 
 # Create your views here
+
+
+class UserProfileUpdateAPIView(APIView):
+    def put(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserUpdateSerializer(
+                instance=user, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"success": f"User with ID {pk} updated successfully"})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def get(self, request, pk):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class RegisterAPIView(APIView):

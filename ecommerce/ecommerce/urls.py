@@ -20,6 +20,7 @@ import app.views as views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/user/<int:pk>", views.UserProfileUpdateAPIView.as_view(), name="user"),
     path("api/register/", views.RegisterAPIView.as_view(), name="register"),
     path("api/login/", views.LoginAPIView.as_view(), name="login"),
     path("api/order/", views.OrderView.as_view(), name="order"),

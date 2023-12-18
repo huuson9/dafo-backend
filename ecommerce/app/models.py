@@ -36,7 +36,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    STATUS_CHOICES = (
+        (0, "Male"),
+        (1, "Female"),
+    )
     email = models.EmailField(db_index=True, unique=True)
+    username = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True)
+    gender = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=0)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     groups = models.ManyToManyField("auth.Group", related_name="custom_user_groups")
