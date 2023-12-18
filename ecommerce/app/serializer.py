@@ -6,6 +6,19 @@ from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "username", "date_of_birth", "phone", "gender"]
+        extra_kwargs = {
+            "username": {"required": False},
+            "email": {"required": False},
+            "phone": {"required": False},
+            "date_of_birth": {"required": False},
+            "gender": {"required": False},
+        }
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=4, max_length=128, write_only=True)
     email = serializers.EmailField(required=True)
