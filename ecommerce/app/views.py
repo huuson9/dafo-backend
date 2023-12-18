@@ -210,3 +210,16 @@ class CartByUserView(APIView):
         carts = Cart.objects.filter(user=user_id)
         serializer = CartSerializer(carts, many=True)
         return Response({"carts": serializer.data})
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        user = User.objects.get(email=email)
+        if user:
+            new_password = request.data.get("new_password")
+            if new_password == request.data.get("confirm_password"):
+                user.set_password(new_password)
+                user.save()
+                return Response({"success": True, "msg": "Reset password successfully"})
+        else:
+            return Response({"success": False, "msg": "Email is not exist"})

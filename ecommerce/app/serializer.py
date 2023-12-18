@@ -123,3 +123,15 @@ class ProductSerializer(serializers.ModelSerializer):
             "images",
             "reviews",
         )
+
+class RequestResetPassword(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    class Meta:
+        fields = ['email', 'new_password', 'confirm_password']
+
+    def validate_email(self, value):
+        user = User.objects.get(email=value)
+        if not user.exists():
+            raise ValidationError({"success": False, "msg": "Email does not exist."})
+        return value
+    
