@@ -89,10 +89,37 @@ class Product(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    price = models.FloatField()
+    price = models.FloatField(default=0)
+    ship_fee = models.FloatField(default=0)
     time = models.DateTimeField(auto_now_add=True)
+
+    REQUIRED_FIELDS = ["user", "price", "ship_fee"]
+
+    def __str__(self):
+        return str(self.id)
+    
+class OrderDetail(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     count = models.PositiveIntegerField(default=1)
+
+    REQUIRED_FIELDS = ["product", "count"]
+    
+    def __str__(self):
+        return self.order.user.email
+    
+class DeliveryInfo(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    district = models.CharField(max_length=255)
+    street = models.CharField(max_length=255)
+
+    REQUIRED_FIELDS = ["name", "phone", "province", "district", "street"]
+
+    def __str__(self):
+        return self.name
 
 
 class Purchase(models.Model):

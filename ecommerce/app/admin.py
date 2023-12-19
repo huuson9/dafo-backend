@@ -5,11 +5,13 @@ from .models import (
     Category,
     Product,
     Order,
+    OrderDetail,
     Purchase,
     Cart,
     ProductImage,
     Review,
     Voucher,
+    DeliveryInfo
 )
 
 
@@ -27,21 +29,13 @@ class CartAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("user", "product", "price", "time", "count", "get_product_category")
+    list_display = ("user", "price", "ship_fee", "time" )
 
-    search_fields = ("product__name", "product__category__name")
+class OrderDetailAdmin(admin.ModelAdmin):
+    list_display = ("order", "product", "count")
 
-    def get_product_category(self, obj):
-        return obj.product.category.name if obj.product.category else None
-
-    get_product_category.short_description = "Category"
-
-    get_product_category.admin_order_field = "product__category__name"
-
-    readonly_fields = ("get_product_category",)
-
-    list_filter = ["user", "product__category"]
-
+class DeliveryInfoAdmin(admin.ModelAdmin):
+    list_display = ("order", "name", "phone", "province", "district", "street")
 
 class UserAdmin(admin.ModelAdmin):
     list_display = (
@@ -67,3 +61,5 @@ admin.site.register(Cart, CartAdmin)
 admin.site.register(ProductImage)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Voucher)
+admin.site.register(OrderDetail, OrderDetailAdmin)
+admin.site.register(DeliveryInfo)
