@@ -124,11 +124,13 @@ class OrderByUserView(APIView):
 
 class ProductView(APIView):
     def get(self, request):
-        products = Product.objects.all()
+        name = request.query_params.get("name", "")
+        if name.strip():  # Check if name is not empty or contains only whitespace
+            products = Product.objects.filter(name__icontains=name)
+        else:
+            products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
-        return Response(
-            {"products": serializer.data}
-        )  # Trả về dữ liệu đã được serialize
+        return Response({"products": serializer.data})
 
     def post(self, request):
         product = request.data.get("product")
