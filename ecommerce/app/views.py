@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView, status
-from .models import Order, Product, Category, User, Cart
+from .models import Order, Product, Category, User, Cart, OrderDetail, DeliveryInfo
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
@@ -12,12 +12,12 @@ from .serializer import (
     RegisterSerializer,
     LoginSerializer,
     UserUpdateSerializer,
+    OrderDetailSerializer,
+    DeliveryInfoSerializer
 )
 
 
 # Create your views here
-
-
 class UserProfileUpdateAPIView(APIView):
     def put(self, request, pk):
         try:
@@ -83,15 +83,6 @@ class OrderView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class OrderByUserView(APIView):
-    def get(self, request, user_id):
-        # Lấy tất cả các đơn hàng của người dùng cụ thể (dựa trên user_id)
-        orders = Order.objects.filter(user=user_id)
-        serializer = OrderSerializer(orders, many=True)
-        return Response({"orders": serializer.data})
-
-
 class OrderDetailView(APIView):
     def get(self, request, pk):
         order = Order.objects.get(pk=pk)
@@ -115,12 +106,49 @@ class OrderDetailView(APIView):
             {"message": "Order with id `{}` has been deleted.".format(pk)}, status=204
         )
 
-
+import pprint
 class OrderByUserView(APIView):
     def get(self, request, user_id):
         orders = Order.objects.filter(user=user_id)
         serializer = OrderSerializer(orders, many=True)
+
+        for order in serializer.data:
+            order_details = OrderDetail.objects.filter(order=order["id"])
+            order["order_details"] = OrderDetailSerializer(order_details, many=True).data
+            delivery_info = DeliveryInfo.objects.filter(order=order["id"])
+            order["delivery_info"] = DeliveryInfoSerializer(delivery_info, many=True).data
         return Response({"orders": serializer.data})
+    
+    def post(self, request, user_id):
+        # Tạo đơn hàng mới cho người dùng cụ thể (dựa trên user_id)
+        request.data["user"] = user_id
+        serializer = OrderSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            
+            # delivery_info.save()
+            for product in request.data["orders"][0]["order_details"]:
+                product["order"] = serializer.data["id"]
+                order = OrderDetailSerializer(data=product)
+
+                if order.is_valid():
+                    order.save()
+                else:
+                    print(order.errors)
+            
+            for delivery in request.data["orders"][0]["delivery_info"]:
+                delivery["order"] = serializer.data["id"]
+                delivery_info = DeliveryInfoSerializer(data=delivery)
+                
+                if delivery_info.is_valid():
+                    delivery_info.save()
+                else:
+                    print(delivery_info.errors)
+                    
+            return Response({"success": f"Đơn hàng đã được tạo thành công"})
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductView(APIView):

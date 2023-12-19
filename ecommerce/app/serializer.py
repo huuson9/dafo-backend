@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, ProductImage, Product, Category, User, Review, Cart
+from .models import Order, ProductImage, Product, Category, User, Review, Cart, OrderDetail, DeliveryInfo
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from rest_framework import serializers, exceptions
@@ -88,6 +88,17 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderDetail
+        fields = "__all__"
+
+
+class DeliveryInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryInfo
+        fields = "__all__"
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
