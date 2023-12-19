@@ -74,13 +74,17 @@ class OrderView(APIView):
         return Response({"orders": serializer.data})
 
     def post(self, request):
-        order = request.data.get("order")
-        serializer = OrderSerializer(data=order)
-        if serializer.is_valid(raise_exception=True):
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():
             order_saved = serializer.save()
-        return Response(
-            {"success": "Order '{}' created successfully".format(order_saved.name)}
-        )
+            return Response(
+                {
+                    "success": "Đơn hàng '{}' đã được tạo thành công".format(
+                        order_saved.id
+                    )
+                }
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderByUserView(APIView):
