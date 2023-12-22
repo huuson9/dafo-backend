@@ -36,7 +36,7 @@ jobs:
           context: .
           file: ./django.Dockerfile
           push: true
-          tags: 
+          tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:${{ steps.vars.outputs.sha_short }}
 
@@ -67,7 +67,7 @@ jobs:
           context: .
           file: ./mysql.Dockerfile
           push: true
-          tags: 
+          tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:${{ steps.vars.outputs.sha_short }}
       
