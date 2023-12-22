@@ -1,14 +1,17 @@
-name: Docker Image CI
+name: Build and Delivery
 
 on:
   push:
-    branches: [ "main", "database-stage"]
+    branches:
+      - main
+      - database-stage
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
     steps:
       -
         name: Checkout
@@ -29,10 +32,13 @@ jobs:
           context: .
           file: ./django.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:latest
+          tags: 
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:${{ github.sha }}
 
   db_build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.event.ref == 'refs/heads/database-stage'
     steps:
       -
         name: Checkout
@@ -53,5 +59,7 @@ jobs:
           context: .
           file: ./mysql.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:latest
+          tags: 
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:${{ github.sha }}
       
