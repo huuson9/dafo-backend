@@ -34,7 +34,7 @@ jobs:
           push: true
           tags: 
             ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafo-backend:${{ github.sha | slice(0, 7) }}
 
   db_build:
     runs-on: ubuntu-latest
@@ -61,5 +61,5 @@ jobs:
           push: true
           tags: 
             ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/dafodb:${{ github.sha | slice(0, 7) }}
       
