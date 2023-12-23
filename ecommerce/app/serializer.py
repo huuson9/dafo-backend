@@ -1,5 +1,15 @@
 from rest_framework import serializers
-from .models import Order, ProductImage, Product, Category, User, Review, Cart, OrderDetail, DeliveryInfo
+from .models import (
+    Order,
+    ProductImage,
+    Product,
+    Category,
+    User,
+    Review,
+    Cart,
+    OrderDetail,
+    DeliveryInfo,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from rest_framework import serializers, exceptions
@@ -90,6 +100,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
+    product = serializers.SerializerMethodField()
+
+    def get_product(self, obj):
+        return ProductSerializer(obj.product).data
+
     class Meta:
         model = OrderDetail
         fields = "__all__"
@@ -99,6 +114,7 @@ class DeliveryInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryInfo
         fields = "__all__"
+
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -148,14 +164,15 @@ class ProductSerializer(serializers.ModelSerializer):
             "reviews",
         )
 
+
 class RequestResetPassword(serializers.Serializer):
     email = serializers.EmailField(required=True)
+
     class Meta:
-        fields = ['email', 'new_password', 'confirm_password']
+        fields = ["email", "new_password", "confirm_password"]
 
     def validate_email(self, value):
         user = User.objects.get(email=value)
         if not user.exists():
             raise ValidationError({"success": False, "msg": "Email does not exist."})
         return value
-    
