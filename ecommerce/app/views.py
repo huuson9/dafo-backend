@@ -35,7 +35,9 @@ class UserProfileUpdateAPIView(APIView):
             )
 
     def get(self, request, pk):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        user = User.objects.get(pk=request.user.id)
+        serializer = UserUpdateSerializer(user)
+        return Response({"user": serializer.data})
 
 
 class RegisterAPIView(APIView):
