@@ -5,6 +5,10 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "username", "date_of_birth", "phone", "gender"]
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
