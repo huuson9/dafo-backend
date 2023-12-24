@@ -11,6 +11,7 @@ from .serializer import (
     CartSerializer,
     RegisterSerializer,
     LoginSerializer,
+    UserSerializer,
     UserUpdateSerializer,
     OrderDetailSerializer,
     DeliveryInfoSerializer
@@ -33,10 +34,22 @@ class UserProfileUpdateAPIView(APIView):
             return Response(
                 {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
-
+        
     def get(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserSerializer(user)
+            return Response({"user": serializer.data})
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+  
+
+class UserProfileView(APIView):
+    def get(self, request):
         user = User.objects.get(pk=request.user.id)
-        serializer = UserUpdateSerializer(user)
+        serializer = UserSerializer(user)
         return Response({"user": serializer.data})
 
 
