@@ -1,6 +1,15 @@
 from django.shortcuts import render
 from rest_framework.views import APIView, status
-from .models import Order, Product, Category, User, Cart, OrderDetail, DeliveryInfo
+from .models import (
+    Order,
+    Product,
+    Category,
+    User,
+    Cart,
+    OrderDetail,
+    DeliveryInfo,
+    Review,
+)
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
@@ -14,7 +23,8 @@ from .serializer import (
     UserSerializer,
     UserUpdateSerializer,
     OrderDetailSerializer,
-    DeliveryInfoSerializer
+    DeliveryInfoSerializer,
+    ReviewSerializer,
 )
 
 
@@ -34,7 +44,7 @@ class UserProfileUpdateAPIView(APIView):
             return Response(
                 {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
     def get(self, request, pk):
         try:
             user = User.objects.get(pk=pk)
@@ -44,7 +54,7 @@ class UserProfileUpdateAPIView(APIView):
             return Response(
                 {"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
-  
+
 
 class UserProfileView(APIView):
     def get(self, request):
@@ -98,6 +108,7 @@ class OrderView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class OrderDetailView(APIView):
     def get(self, request, pk):
         order = Order.objects.get(pk=pk)
@@ -121,7 +132,10 @@ class OrderDetailView(APIView):
             {"message": "Order with id `{}` has been deleted.".format(pk)}, status=204
         )
 
+
 import pprint
+
+
 class OrderByUserView(APIView):
     def get(self, request, user_id):
         orders = Order.objects.filter(user=user_id)
@@ -129,19 +143,23 @@ class OrderByUserView(APIView):
 
         for order in serializer.data:
             order_details = OrderDetail.objects.filter(order=order["id"])
-            order["order_details"] = OrderDetailSerializer(order_details, many=True).data
+            order["order_details"] = OrderDetailSerializer(
+                order_details, many=True
+            ).data
             delivery_info = DeliveryInfo.objects.filter(order=order["id"])
-            order["delivery_info"] = DeliveryInfoSerializer(delivery_info, many=True).data
+            order["delivery_info"] = DeliveryInfoSerializer(
+                delivery_info, many=True
+            ).data
         return Response({"orders": serializer.data})
-    
+
     def post(self, request, user_id):
         # Tạo đơn hàng mới cho người dùng cụ thể (dựa trên user_id)
         request.data["user"] = user_id
         serializer = OrderSerializer(data=request.data)
-        
+
         if serializer.is_valid():
             serializer.save()
-            
+
             # delivery_info.save()
             for product in request.data["orders"][0]["order_details"]:
                 product["order"] = serializer.data["id"]
@@ -151,18 +169,18 @@ class OrderByUserView(APIView):
                     order.save()
                 else:
                     print(order.errors)
-            
+
             for delivery in request.data["orders"][0]["delivery_info"]:
                 delivery["order"] = serializer.data["id"]
                 delivery_info = DeliveryInfoSerializer(data=delivery)
-                
+
                 if delivery_info.is_valid():
                     delivery_info.save()
                 else:
                     print(delivery_info.errors)
-                    
+
             return Response({"success": f"Đơn hàng đã được tạo thành công"})
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -278,6 +296,7 @@ class CartByUserView(APIView):
         serializer = CartSerializer(carts, many=True)
         return Response({"carts": serializer.data})
 
+
 class ResetPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -290,3 +309,41 @@ class ResetPasswordView(APIView):
                 return Response({"success": True, "msg": "Reset password successfully"})
         else:
             return Response({"success": False, "msg": "Email is not exist"})
+
+
+class ReviewByProductView(APIView):
+    def get(self, request, product_id):
+        reviews = Review.objects.filter(product=product_id)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response({"reviews": serializer.data})
+
+    def post(self, request, product_id):
+        user_id = request.data.get("user")
+        content = request.data.get("content")
+        rating = request.data.get("rating")
+
+        if user_id is None or content is None or rating is None:
+            return Response(
+                {"error": "Thiếu thông tin cần thiết"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return Response(
+                {"error": "user_id không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        data = {
+            "content": content,
+            "rating": rating,
+            "product": product_id,
+            "user": user_id,
+        }
+
+        serializer = ReviewSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": f"Đánh giá đã được tạo thành công"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
