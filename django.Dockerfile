@@ -1,13 +1,9 @@
-# Sử dụng một hình ảnh cơ sở Python
 FROM python:3.9
 
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
 WORKDIR /app
+COPY requirements.txt /app
+RUN pip3 install -r requirements.txt --no-cache-dir
+COPY . /app 
+CMD ["python3", "/app/ecommerce/manage.py", "runserver", "0.0.0.0:8000"]
 
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app/
+EXPOSE 8000
