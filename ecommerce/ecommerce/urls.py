@@ -43,5 +43,10 @@ urlpatterns = [
         views.CartByUserView.as_view(),
         name="cart-by-user",
     ),
-    path('api/reset_password/', views.ResetPasswordView.as_view(), name='reset-password'),
+    path(
+        "api/reset_password/", views.ResetPasswordView.as_view(), name="reset-password"
+    ),
+    path(
+        "api/review/product/<int:product_id>", views.ReviewByProductView.as_view(), name="review"
+    ),
 ]

@@ -15,10 +15,12 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "username", "date_of_birth", "phone", "gender"]
+
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -133,16 +135,15 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
-        fields = "user", "rating", "content", "time"
+        fields = ("id", "user", "user_email", "product", "content", "rating", "time")
+        read_only_fields = ("id", "time")
 
-    def get_user(self, obj):
-        return {
-            "email": obj.user.email,
-        }
+    def get_user_email(self, obj):
+        return obj.user.email
 
 
 class ProductSerializer(serializers.ModelSerializer):
