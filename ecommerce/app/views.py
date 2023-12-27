@@ -146,10 +146,16 @@ class OrderByUserView(APIView):
             order["order_details"] = OrderDetailSerializer(
                 order_details, many=True
             ).data
+
+            for order_detail in order["order_details"]:
+                product = Product.objects.get(pk=order_detail["product"])
+                order_detail["product"] = ProductSerializer(product).data
+
             delivery_info = DeliveryInfo.objects.filter(order=order["id"])
             order["delivery_info"] = DeliveryInfoSerializer(
                 delivery_info, many=True
             ).data
+
         return Response({"orders": serializer.data})
 
     def post(self, request, user_id):
