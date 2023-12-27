@@ -106,12 +106,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-    product = serializers.SerializerMethodField()
-
-    def get_product(self, obj):
-        return ProductSerializer(obj.product).data
-
-    class Meta:
+       class Meta:
         model = OrderDetail
         fields = "__all__"
 

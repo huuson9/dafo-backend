@@ -154,26 +154,27 @@ class OrderByUserView(APIView):
 
     def post(self, request, user_id):
         # Tạo đơn hàng mới cho người dùng cụ thể (dựa trên user_id)
+        latest_id = Order.objects.latest("id").id + 1
+        request.data["id"] = latest_id
         request.data["user"] = user_id
         serializer = OrderSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
 
-            # delivery_info.save()
-            for product in request.data["orders"][0]["order_details"]:
-                product["order"] = serializer.data["id"]
-                order = OrderDetailSerializer(data=product)
-
-                if order.is_valid():
-                    order.save()
+            for product in request.data["order_details"]:
+                pprint.pprint(product)
+                product["order"] = latest_id
+                order_info = OrderDetailSerializer(data=product)
+                if order_info.is_valid():
+                    order_info.save()
                 else:
-                    print(order.errors)
+                    print(order_info.errors)
 
-            for delivery in request.data["orders"][0]["delivery_info"]:
-                delivery["order"] = serializer.data["id"]
+            for delivery in request.data["delivery_info"]:
+                pprint.pprint(delivery)
+                delivery["order"] = latest_id
                 delivery_info = DeliveryInfoSerializer(data=delivery)
-
                 if delivery_info.is_valid():
                     delivery_info.save()
                 else:
